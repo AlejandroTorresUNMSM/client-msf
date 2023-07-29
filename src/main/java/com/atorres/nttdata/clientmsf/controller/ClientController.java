@@ -29,7 +29,7 @@ public class ClientController {
    * Metodo que retorna todos los clientes
    * @return lista clientDao
    */
-  @GetMapping(value = "/",
+  @GetMapping(path = {"","/"},
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<ClientDto> getListClients() {
     return clientService.findAll()
@@ -41,7 +41,7 @@ public class ClientController {
    * @param cp cliente request
    * @return cliente
    */
-  @PostMapping(value = "/",
+  @PostMapping(path = {"","/"},
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Mono<ClientDto> createClient(
           @Valid @RequestBody
