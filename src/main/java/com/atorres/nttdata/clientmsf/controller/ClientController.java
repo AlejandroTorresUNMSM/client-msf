@@ -64,6 +64,19 @@ public class ClientController {
   }
 
   /**.
+   * Metodo para encontrar un cliente por su celular
+   * @param phone id del cliente
+   * @return cliente
+   */
+  @GetMapping(value = "/phone/{phone}",
+      produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Mono<ClientDto> getClientByPhone(
+      @PathVariable final String phone) {
+    return clientService.searchByPhone(phone)
+        .doOnSuccess(v -> log.info("Cliente encontrado con exito"));
+  }
+
+  /**.
    * Metodo para actualizar un cliente
    * @param id id cliente
    * @param cp cliente request
@@ -99,4 +112,6 @@ public class ClientController {
     return clientService.updateType(clientId,typeClient)
             .doOnSuccess(v -> log.info("Tipo de cliente actualizado con exito"));
   }
+
+
 }

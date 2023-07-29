@@ -31,5 +31,9 @@ public class ClientPost {
     @NotNull
     @JsonProperty("typeClient")
     private CreateClientType typeClient;
+    /**
+     * Numero celular
+     */
+    private String phone;
 
 }

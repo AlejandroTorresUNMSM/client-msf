@@ -10,10 +10,6 @@ public class ClientDto {
      */
     private String id;
     /**.
-     * Tipos de documento
-     */
-    private String typeDocument;
-    /**.
      * Numero del documento
      */
     private String nroDocument;
@@ -25,4 +21,8 @@ public class ClientDto {
      * Tipo del cliente
      */
     private ClientType typeClient;
+    /**
+     * Numero celular
+     */
+    private String phone;
 }

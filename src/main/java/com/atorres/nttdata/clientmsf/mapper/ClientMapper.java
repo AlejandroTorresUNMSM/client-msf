@@ -17,13 +17,13 @@ public class ClientMapper {
      * @param clientPost clientepost
      * @return clientdao
      */
-    public ClientDao clientposttoClientDao(final ClientPost clientPost) {
+    public ClientDao toDao(final ClientPost clientPost) {
         ClientDao clientDao = new ClientDao();
         clientDao.setId(generateId());
         clientDao.setName(clientPost.getName());
-        clientDao.setTypeDocument(clientPost.getTypeDocument());
         clientDao.setNroDocument(clientPost.getNroDocument());
         clientDao.setTypeClient(enumConverter.toClientType(clientPost.getTypeClient()));
+        clientDao.setPhone(clientDao.getPhone());
         return clientDao;
     }
 
@@ -33,22 +33,20 @@ public class ClientMapper {
      * @param request idcliente
      * @return client
      */
-    public ClientDao clientposttoClientDaoUpdate(
+    public ClientDao toDao(
             final ClientDao clientDao,
             final RequestClientUpdate request) {
-        clientDao.setName(request.getName());
-        clientDao.setTypeDocument(request.getTypeDocument());
         clientDao.setNroDocument(request.getNroDocument());
         return clientDao;
     }
 
-    public ClientDto toClient(ClientDao clientDao){
+    public ClientDto toDto(ClientDao clientDao){
         ClientDto client = new ClientDto();
         client.setId(clientDao.getId());
         client.setName(clientDao.getName());
-        client.setTypeDocument(clientDao.getTypeDocument());
         client.setNroDocument(clientDao.getNroDocument());
         client.setTypeClient(clientDao.getTypeClient());
+        client.setPhone(clientDao.getPhone());
         return client;
     }
 

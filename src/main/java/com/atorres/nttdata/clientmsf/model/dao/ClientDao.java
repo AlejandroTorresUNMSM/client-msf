@@ -14,10 +14,6 @@ public class ClientDao {
     @Id
     private String id;
     /**.
-     * Tipo del documento
-     */
-    private String typeDocument;
-    /**.
      * Numero del documento
      */
     private String nroDocument;
@@ -29,5 +25,9 @@ public class ClientDao {
      * Tipo del cliente
      */
     private ClientType typeClient;
+    /**
+     * Numero celular
+     */
+    private String phone;
 
 }

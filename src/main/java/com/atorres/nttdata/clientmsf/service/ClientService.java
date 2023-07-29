@@ -5,6 +5,7 @@ import com.atorres.nttdata.clientmsf.mapper.ClientMapper;
 import com.atorres.nttdata.clientmsf.model.ClientDto;
 import com.atorres.nttdata.clientmsf.model.ClientPost;
 import com.atorres.nttdata.clientmsf.model.RequestClientUpdate;
+import com.atorres.nttdata.clientmsf.model.dao.ClientDao;
 import com.atorres.nttdata.clientmsf.repository.ClientRepository;
 import com.atorres.nttdata.clientmsf.utils.ClientType;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class ClientService {
      */
     public Flux<ClientDto> findAll() {
         return dao.findAll()
-                .map(clientMapper::toClient);
+                .map(clientMapper::toDto);
     }
 
     /**.
@@ -51,7 +52,7 @@ public class ClientService {
                     return Mono.error(new CustomException(HttpStatus.NOT_FOUND,
                             "No se encontró al cliente"));
                 }))
-                .map(clientMapper::toClient);
+                .map(clientMapper::toDto);
     }
 
     /**.
@@ -60,15 +61,26 @@ public class ClientService {
      * @return clienteDao
      */
     public Mono<ClientDto> save(final ClientPost client) {
+        return validateClient(client)
+            .flatMap(clientDao -> dao.save(clientDao))
+            .map(clientMapper::toDto);
+    }
+
+    /**
+     * Vemos si ya existe un cliente con ese documento o celular
+     * @param clientpost cliente request
+     * @return clientDao
+     */
+    private Mono<ClientDao> validateClient(ClientPost clientpost){
         return dao.findAll()
-                .filter(cl -> cl.getTypeDocument().equals(client.getTypeDocument())
-                        && cl.getNroDocument().equals(client.getNroDocument()))
-                .any(cl -> true)
-                .flatMap(exist -> Boolean.TRUE.equals(exist)
-                        ?   Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-                        "Ya existe el nroDocumento y tipo"))
-                        : dao.save(clientMapper.clientposttoClientDao(client)) )
-                .map(clientMapper::toClient);
+            .filter(cl -> cl.getNroDocument().equals(clientpost.getNroDocument()) || cl.getPhone().equals(clientpost.getPhone()))
+            .any(cl -> true)
+            .flatMap(exist -> {
+                if(Boolean.TRUE.equals(exist))
+                    return Mono.error(new CustomException(HttpStatus.BAD_REQUEST, "Existe el nroDocumento o phone"));
+                else
+                    return Mono.just(clientMapper.toDao(clientpost));
+            });
     }
 
     /**.
@@ -97,19 +109,23 @@ public class ClientService {
             final String id,
             final RequestClientUpdate request) {
         return dao.findAll()
-                .filter(cl -> cl.getTypeDocument().equals(request.getTypeDocument())
-                        && cl.getNroDocument().equals(request.getNroDocument()))
+                .filter(cl -> cl.getNroDocument().equals(request.getNroDocument()))
                 .any(cl -> true)
                 .flatMap(exist -> Boolean.TRUE.equals(exist)
                         ?   Mono.error(new CustomException(HttpStatus.BAD_REQUEST,
-                        "Ya existe el nroDocumento y tipo"))
+                        "Ya existe el nroDocumento"))
                         : dao.findById(id))
-                .map(client -> clientMapper.
-                        clientposttoClientDaoUpdate(client, request))
+                .map(client -> clientMapper.toDao(client, request))
                 .flatMap(client -> dao.save(client))
-                .map(clientMapper::toClient);
+                .map(clientMapper::toDto);
     }
 
+    /**
+     * Metodo que actualiza el tipo de cliente
+     * @param idClient id cliente
+     * @param clientType tipo cliente
+     * @return clientDto
+     */
     public Mono<ClientDto> updateType(String idClient, ClientType clientType){
         return dao.findById(idClient)
                 .switchIfEmpty(Mono.error(new CustomException(HttpStatus.NOT_FOUND, "No existe el cliente")))
@@ -117,6 +133,17 @@ public class ClientService {
                     cl.setTypeClient(clientType);
                     return  dao.save(cl);
                 })
-                .map(clientMapper::toClient);
+                .map(clientMapper::toDto);
+    }
+
+    /**
+     * Metodo que trae un cliente por su celular
+     * @param phone celular
+     * @return clientDto
+     */
+    public Mono<ClientDto> searchByPhone(String phone){
+        return dao.findByPhone(phone)
+            .map(clientMapper::toDto);
+
     }
 }
