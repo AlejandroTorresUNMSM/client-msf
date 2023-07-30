@@ -121,22 +121,6 @@ public class ClientService {
     }
 
     /**
-     * Metodo que actualiza el tipo de cliente
-     * @param idClient id cliente
-     * @param clientType tipo cliente
-     * @return clientDto
-     */
-    public Mono<ClientDto> updateType(String idClient, ClientType clientType){
-        return dao.findById(idClient)
-                .switchIfEmpty(Mono.error(new CustomException(HttpStatus.NOT_FOUND, "No existe el cliente")))
-                .flatMap(cl ->{
-                    cl.setTypeClient(clientType);
-                    return  dao.save(cl);
-                })
-                .map(clientMapper::toDto);
-    }
-
-    /**
      * Metodo que trae un cliente por su celular
      * @param phone celular
      * @return clientDto

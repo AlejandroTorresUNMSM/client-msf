@@ -104,14 +104,4 @@ public class ClientController {
             .doOnSuccess(v -> log.info("Cliente eliminado con exito"));
   }
 
-  @PatchMapping(value = "/updateType/{clientId}/{typeClient}",
-          produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Mono<ClientDto> updateType(
-          @PathVariable final String clientId,
-          @PathVariable final ClientType typeClient) {
-    return clientService.updateType(clientId,typeClient)
-            .doOnSuccess(v -> log.info("Tipo de cliente actualizado con exito"));
-  }
-
-
 }

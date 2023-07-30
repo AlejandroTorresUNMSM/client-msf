@@ -11,11 +11,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ClientPost {
     /**.
-     * Tipo del documento
-     */
-    @NotBlank
-    private String typeDocument;
-    /**.
      * Numero del documento
      */
     @NotBlank
@@ -34,6 +29,8 @@ public class ClientPost {
     /**
      * Numero celular
      */
+    @NotBlank
+    @JsonProperty("phone")
     private String phone;
 
 }

@@ -23,7 +23,7 @@ public class ClientMapper {
         clientDao.setName(clientPost.getName());
         clientDao.setNroDocument(clientPost.getNroDocument());
         clientDao.setTypeClient(enumConverter.toClientType(clientPost.getTypeClient()));
-        clientDao.setPhone(clientDao.getPhone());
+        clientDao.setPhone(clientPost.getPhone());
         return clientDao;
     }
 
