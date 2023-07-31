@@ -7,7 +7,6 @@ import com.atorres.nttdata.clientmsf.model.ClientPost;
 import com.atorres.nttdata.clientmsf.model.RequestClientUpdate;
 import com.atorres.nttdata.clientmsf.model.dao.ClientDao;
 import com.atorres.nttdata.clientmsf.repository.ClientRepository;
-import com.atorres.nttdata.clientmsf.utils.ClientType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class ClientService {
+    @Autowired
+    private KafkaStringProducer kafkaStringProducer;
     /**.
      * Repositorio para cliente
      */
@@ -30,13 +31,17 @@ public class ClientService {
     @Autowired
     private ClientMapper clientMapper;
 
+    public ClientService() {
+    }
+
     /**.
      * Metodo que encuentra todos los clientes
      * @return lista de clientes
      */
     public Flux<ClientDto> findAll() {
         return dao.findAll()
-                .map(clientMapper::toDto);
+                .map(clientMapper::toDto)
+                .doOnComplete(()->kafkaStringProducer.sendMessage("Clientes encontrados con exito"));
     }
 
     /**.
@@ -52,7 +57,8 @@ public class ClientService {
                     return Mono.error(new CustomException(HttpStatus.NOT_FOUND,
                             "No se encontró al cliente"));
                 }))
-                .map(clientMapper::toDto);
+                .map(clientMapper::toDto)
+                .doOnSuccess(v -> kafkaStringProducer.sendMessage("Cliente por Id encontrado con exito"));
     }
 
     /**.
@@ -63,7 +69,8 @@ public class ClientService {
     public Mono<ClientDto> save(final ClientPost client) {
         return validateClient(client)
             .flatMap(clientDao -> dao.save(clientDao))
-            .map(clientMapper::toDto);
+            .map(clientMapper::toDto)
+            .doOnSuccess(v -> kafkaStringProducer.sendMessage("Cliente creado con exito"));
     }
 
     /**
@@ -96,7 +103,8 @@ public class ClientService {
                 .flatMap(exists -> Boolean.TRUE.equals(exists)
                         ? dao.deleteById(id)
                         : Mono.error(new CustomException(HttpStatus.NOT_FOUND,
-                        "No existe el cliente a eliminar")));
+                        "No existe el cliente a eliminar")))
+                .doOnSuccess(v -> kafkaStringProducer.sendMessage("Cliente eliminado con exito"));
     }
 
     /**.
