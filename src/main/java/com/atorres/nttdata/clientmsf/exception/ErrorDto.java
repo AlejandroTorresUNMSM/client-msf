@@ -4,15 +4,21 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+/**
+ * .
+ * Clase ErrorDto
+ */
 @Data
 @Builder
 public class ErrorDto {
-    /**.
-     * HttpStatus error
-     */
-    private HttpStatus httpStatus;
-    /**.
-     * Mensaje de error
-     */
-    private String message;
+  /**
+   * .
+   * HttpStatus error
+   */
+  private HttpStatus httpStatus;
+  /**
+   * .
+   * Mensaje de error
+   */
+  private String message;
 }

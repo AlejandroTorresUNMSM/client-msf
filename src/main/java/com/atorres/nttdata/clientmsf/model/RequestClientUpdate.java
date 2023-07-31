@@ -1,10 +1,12 @@
 package com.atorres.nttdata.clientmsf.model;
 
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 
-
+/**.
+ * Clase RequestClientUpdate
+ */
 @Data
 public class RequestClientUpdate {
   /**.

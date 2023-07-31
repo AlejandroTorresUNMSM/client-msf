@@ -4,17 +4,25 @@ import com.atorres.nttdata.clientmsf.model.ClientDto;
 import com.atorres.nttdata.clientmsf.model.ClientPost;
 import com.atorres.nttdata.clientmsf.model.RequestClientUpdate;
 import com.atorres.nttdata.clientmsf.service.ClientService;
-import com.atorres.nttdata.clientmsf.utils.ClientType;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
 
-
+/**.
+ * Controlador API Clientes
+ */
 @RestController
 @RequestMapping("/api/client")
 @Slf4j
@@ -26,10 +34,11 @@ public class ClientController {
   private ClientService clientService;
 
   /**.
-   * Metodo que retorna todos los clientes
-   * @return lista clientDao
+   * Metodo que retorna todos los clientes.
+   *
+   * @return lista clientDao.
    */
-  @GetMapping(path = {"","/"},
+  @GetMapping(path = {"", "/"},
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<ClientDto> getListClients() {
     return clientService.findAll()
@@ -38,10 +47,12 @@ public class ClientController {
 
   /**.
    * Metodo para crear un cliente
+   *
    * @param cp cliente request
+   *
    * @return cliente
    */
-  @PostMapping(path = {"","/"},
+  @PostMapping(path = {"", "/"},
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Mono<ClientDto> createClient(
           @Valid @RequestBody
@@ -52,7 +63,9 @@ public class ClientController {
 
   /**.
    * Metodo para encontrar un cliente por su id
+   *
    * @param id id del cliente
+   *
    * @return cliente
    */
   @GetMapping(value = "/{id}",
@@ -64,9 +77,11 @@ public class ClientController {
   }
 
   /**.
-   * Metodo para encontrar un cliente por su celular
-   * @param phone id del cliente
-   * @return cliente
+   * Metodo para encontrar un cliente por su celular.
+   *
+   * @param phone id del cliente.
+   *
+   * @return cliente.
    */
   @GetMapping(value = "/phone/{phone}",
       produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -77,10 +92,12 @@ public class ClientController {
   }
 
   /**.
-   * Metodo para actualizar un cliente
-   * @param id id cliente
-   * @param cp cliente request
-   * @return cliente
+   * Metodo para actualizar un cliente.
+   *
+   * @param id id cliente.
+   * @param cp cliente request.
+   *
+   * @return cliente.
    */
   @PutMapping(value = "/update/{id}",
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -93,7 +110,9 @@ public class ClientController {
 
   /**.
    * Metodo para eliminar un cliente
-   * @param id id cliente
+   *
+   * @param id clientId
+   *
    * @return void
    */
   @DeleteMapping(value = "/{id}",
