@@ -18,6 +18,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class ClientService {
+    /**
+     * Kafka producer
+     */
     @Autowired
     private KafkaStringProducer kafkaStringProducer;
     /**.
