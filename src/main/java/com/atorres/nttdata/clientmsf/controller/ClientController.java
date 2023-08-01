@@ -3,7 +3,7 @@ package com.atorres.nttdata.clientmsf.controller;
 import com.atorres.nttdata.clientmsf.model.ClientDto;
 import com.atorres.nttdata.clientmsf.model.ClientPost;
 import com.atorres.nttdata.clientmsf.model.RequestClientUpdate;
-import com.atorres.nttdata.clientmsf.service.ClientService;
+import com.atorres.nttdata.clientmsf.service.impl.ClientServiceImpl;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class ClientController {
    * ClienteService
    */
   @Autowired
-  private ClientService clientService;
+  private ClientServiceImpl clientServiceImpl;
 
   /**.
    * Metodo que retorna todos los clientes.
@@ -41,7 +41,7 @@ public class ClientController {
   @GetMapping(path = {"", "/"},
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<ClientDto> getListClients() {
-    return clientService.findAll()
+    return clientServiceImpl.findAll()
             .doOnNext(cl -> log.info("Cliente encontrado: {}", cl));
   }
 
@@ -57,7 +57,7 @@ public class ClientController {
   public Mono<ClientDto> createClient(
           @Valid @RequestBody
           final Mono<ClientPost> cp) {
-    return cp.flatMap(client -> clientService.save(client))
+    return cp.flatMap(client -> clientServiceImpl.save(client))
             .doOnSuccess(v -> log.info("Cliente creado con exito"));
   }
 
@@ -72,7 +72,7 @@ public class ClientController {
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Mono<ClientDto> getClient(
           @PathVariable final String id) {
-    return clientService.findById(id)
+    return clientServiceImpl.findById(id)
             .doOnSuccess(v -> log.info("Cliente encontrado con exito"));
   }
 
@@ -87,7 +87,7 @@ public class ClientController {
       produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Mono<ClientDto> getClientByPhone(
       @PathVariable final String phone) {
-    return clientService.searchByPhone(phone)
+    return clientServiceImpl.searchByPhone(phone)
         .doOnSuccess(v -> log.info("Cliente encontrado con exito"));
   }
 
@@ -104,7 +104,7 @@ public class ClientController {
   public Mono<ClientDto> updateClient(
           @PathVariable final String id,
           @RequestBody final RequestClientUpdate cp) {
-    return clientService.update(id, cp)
+    return clientServiceImpl.update(id, cp)
             .doOnSuccess(v -> log.info("Cliente actualizado con exito"));
   }
 
@@ -119,7 +119,7 @@ public class ClientController {
           produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Mono<Void> deleteClient(
           @PathVariable final String id) {
-    return clientService.delete(id)
+    return clientServiceImpl.delete(id)
             .doOnSuccess(v -> log.info("Cliente eliminado con exito"));
   }
 
