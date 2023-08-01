@@ -150,6 +150,8 @@ public class ClientServiceImpl implements ClientService {
             ? dao.deleteById(id)
             : Mono.error(new CustomException(HttpStatus.NOT_FOUND,
             "No existe el cliente a eliminar")))
+        .flatMap(v -> hashOperations.remove(KEY_REDIS, id))
+        .then()
         .doOnSuccess(v -> kafkaStringProducer.sendMessage("Cliente eliminado con exito"));
   }
 
