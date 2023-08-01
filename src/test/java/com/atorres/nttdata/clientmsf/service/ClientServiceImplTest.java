@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveHashOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -30,6 +30,8 @@ class ClientServiceImplTest {
   private ClientServiceImpl clientServiceImpl;
   @Mock
   private ClientMapper clientMapper;
+  @Mock
+  private ReactiveHashOperations<String, String, ClientDao> hashOperations;
   @Mock
   private KafkaStringProducer kafkaStringProducer;
 
@@ -90,6 +92,8 @@ class ClientServiceImplTest {
     Mockito.doNothing().when(kafkaStringProducer).sendMessage(Mockito.anyString());
     Mockito.when(clientRepository.findById("1")).thenReturn(Mono.just(ca1));
     Mockito.when(clientMapper.toDto(ca1)).thenReturn(cl1);
+    //Mockito.doNothing().when(hashOperations).get(Mockito.anyString(),Mockito.any());
+    Mockito.when(hashOperations.get(Mockito.anyString(),Mockito.any())).thenReturn(Mono.just(ca1));
 
     Mono<ClientDto> resultado = clientServiceImpl.findById("1");
 

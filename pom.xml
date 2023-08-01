@@ -19,7 +19,7 @@
 		<spring-cloud.version>2021.0.8</spring-cloud.version>
 		<!--SONAR PROPERTIES -->
 		<sonar.host.url>http://localhost:9900</sonar.host.url>
-		<sonar.login>sqa_1664af60941125913f33f0f03187c0e67bb485fa</sonar.login>
+		<sonar.login>sqa_f017875803e3a466c166ce3d3ac336b4e195130f</sonar.login>
 		<sonar.projectKey>client-msf</sonar.projectKey>
 		<sonar.sources>src/main/java</sonar.sources>
 		<sonar.tests>src/test/java</sonar.tests>
