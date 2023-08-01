@@ -28,7 +28,8 @@ public class RedisConfig {
       ClientDao> hashOperations(ReactiveRedisConnectionFactory redisConnectionFactory) {
     var template = new ReactiveRedisTemplate<>(
         redisConnectionFactory,
-        RedisSerializationContext.<String, ClientDao>newSerializationContext(new StringRedisSerializer())
+        RedisSerializationContext.<String,
+                ClientDao>newSerializationContext(new StringRedisSerializer())
             .hashKey(new GenericToStringSerializer<>(String.class))
             .hashValue(new Jackson2JsonRedisSerializer<>(ClientDao.class))
             .build()
