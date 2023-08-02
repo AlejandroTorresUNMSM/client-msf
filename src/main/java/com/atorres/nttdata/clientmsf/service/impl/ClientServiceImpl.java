@@ -54,19 +54,6 @@ public class ClientServiceImpl implements ClientService {
   public ClientServiceImpl() {
   }
 
-  /**.
-   * Metodo para revisar si exista el cliente  y pushear al redis
-   */
-  private Mono<ClientDao> checkClientFromMongoRedis(String clientId) {
-    return dao.findById(clientId)
-        .switchIfEmpty(Mono
-            .error(new CustomException(HttpStatus.NOT_FOUND, "No se encontró al cliente")))
-        .flatMap(clientDao -> {
-          log.info("Guardando cliente en redis");
-          return this.hashOperations
-              .put(KEY_REDIS, clientId, clientDao).thenReturn(clientDao);
-        });
-  }
 
   /**
    * .
@@ -91,7 +78,7 @@ public class ClientServiceImpl implements ClientService {
   public Mono<ClientDto> findById(final String clientId) {
     //obtengo el cliente por id si no lo encuentra devuelve una excepcion
     return hashOperations.get(KEY_REDIS, clientId)
-        .switchIfEmpty(this.checkClientFromMongoRedis(clientId))
+        .switchIfEmpty(this.checkClientIdFromMongoRedis(clientId))
         .map(clientMapper::toDto)
         .doOnSuccess(v -> kafkaStringProducer.sendMessage("Cliente por Id encontrado con exito"));
   }
@@ -160,6 +147,7 @@ public class ClientServiceImpl implements ClientService {
    *
    * @param id      id del cliente
    * @param request request del cliente
+   *
    * @return ClienteDao
    */
   public Mono<ClientDto> update(
@@ -174,6 +162,7 @@ public class ClientServiceImpl implements ClientService {
             : dao.findById(id))
         .map(client -> clientMapper.toDao(client, request))
         .flatMap(client -> dao.save(client))
+        .doOnNext(clientDao -> hashOperations.remove(KEY_REDIS, clientDao.getId()))
         .map(clientMapper::toDto);
   }
 
@@ -181,11 +170,50 @@ public class ClientServiceImpl implements ClientService {
    * Metodo que trae un cliente por su celular
    *
    * @param phone celular
+   *
    * @return clientDto
    */
   public Mono<ClientDto> searchByPhone(String phone) {
-    return dao.findByPhone(phone)
-        .map(clientMapper::toDto);
+    return hashOperations.get(KEY_REDIS, phone)
+        .switchIfEmpty(this.checkPhoneFromMongoRedis(phone))
+        .map(clientMapper::toDto)
+        .doOnSuccess(v -> kafkaStringProducer.sendMessage("Phone encontrado con exito"));
 
+  }
+
+  /**.
+   * Metodo para revisar si exista el cliente  y pushear al redis
+   *
+   * @param clientId client id
+   *
+   * @return clientDao
+   */
+  private Mono<ClientDao> checkClientIdFromMongoRedis(String clientId) {
+    return dao.findById(clientId)
+        .switchIfEmpty(Mono
+            .error(new CustomException(HttpStatus.NOT_FOUND, "No se encontró al cliente")))
+        .flatMap(clientDao -> {
+          log.info("Guardando cliente by Id en redis");
+          return this.hashOperations
+              .put(KEY_REDIS, clientId, clientDao).thenReturn(clientDao);
+        });
+  }
+
+  /**.
+   * Metodo para revisa si existe un phone y pushear al redis
+   *
+   * @param phone celular
+   *
+   * @return clientdao
+   */
+  private Mono<ClientDao> checkPhoneFromMongoRedis(String phone) {
+    return dao.findByPhone(phone)
+        .switchIfEmpty(Mono
+            .error(new CustomException(HttpStatus.NOT_FOUND, "No se encontró al phone")))
+        .flatMap(clientDao -> {
+          log.info("Guardando cliente by phone en redis");
+          return this.hashOperations
+              .put(KEY_REDIS, phone, clientDao).thenReturn(clientDao);
+        });
   }
 }

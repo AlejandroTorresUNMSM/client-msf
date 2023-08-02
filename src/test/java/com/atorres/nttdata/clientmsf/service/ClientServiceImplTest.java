@@ -154,6 +154,7 @@ class ClientServiceImplTest {
   void searchByPhone() {
     Mockito.when(clientRepository.findByPhone("999")).thenReturn(Mono.just(ca1));
     Mockito.when(clientMapper.toDto(ca1)).thenReturn(cl1);
+    Mockito.when(hashOperations.get(Mockito.anyString(),Mockito.any())).thenReturn(Mono.just(ca1));
 
     Mono<ClientDto> resultado = clientServiceImpl.searchByPhone("999");
 
